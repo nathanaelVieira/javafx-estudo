@@ -37,13 +37,13 @@ public class PhotoViewer extends Application {
 
 	private ImageView currentImageView;
 	private ProgressIndicator progressIndicator;
-	private AtomicBoolean loading = new AtomicBoolean();
+	private AtomicBoolean loading = new AtomicBoolean(false);
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		primaryStage.setTitle("Photo Viewer");
 		Group root = new Group();
-		Scene scene = new Scene(root, 551, 400, Color.valueOf("#1A1919"));
+		Scene scene = new Scene(root, 800, 400, Color.valueOf("#1A1919"));
 
 //		scene.getStylesheets().add(getClass().getResource("photo-viewer.css").toExternalForm());
 
@@ -77,7 +77,7 @@ public class PhotoViewer extends Application {
 			if (dragboard.hasFiles() && !dragboard.hasUrl()) {
 				dragboard.getFiles().stream().forEach(file -> {
 					try {
-						addImage(file.toURL().toString());
+						addImage(file.toURI().toURL().toString());
 					} catch (MalformedURLException exception) {
 						exception.printStackTrace();
 					}
@@ -97,12 +97,18 @@ public class PhotoViewer extends Application {
 		// create button panel
 		Group buttonGroup = new Group();
 		Rectangle buttonArea = new Rectangle(0, 0, 60, 30);
-		buttonArea.getStyleClass().add("button-panel");
+		buttonArea.setFill(Color.valueOf("#1A1919"));
+		buttonArea.setStroke(Color.WHITE);
+		buttonArea.setStrokeWidth(1.2);
+		buttonArea.setArcHeight(20);
+		buttonArea.setArcWidth(20);
+
+//		buttonArea.getStyleClass().add("button-panel");
 		buttonGroup.getChildren().add(buttonArea);
 		// left arrow button
 		Arc leftButton = new Arc(12, 16, 15, 15, -30, 60);
 		leftButton.setType(ArcType.ROUND);
-		leftButton.getStyleClass().add("left-arrow");
+		leftButton.setFill(Color.WHITE);
 		// return to previous image
 		leftButton.addEventHandler(MouseEvent.MOUSE_PRESSED, (mouseEvent) -> {
 			System.out.println("busy loading? " + loading.get());
@@ -116,9 +122,9 @@ public class PhotoViewer extends Application {
 		});
 
 		// right arrow button
-		Arc rightButton = new Arc(12, 16, 15, 15, 180 - 30, 60);
+		Arc rightButton = new Arc(50, 16, 15, 15, 180 - 30, 60);
 		rightButton.setType(ArcType.ROUND);
-		rightButton.getStyleClass().add("right-arrow");
+		rightButton.setFill(Color.WHITE);
 		// advance to next image
 		rightButton.addEventHandler(MouseEvent.MOUSE_PRESSED, (mouseEvent) -> {
 			System.out.println("busy loading? " + loading.get());
@@ -172,7 +178,7 @@ public class PhotoViewer extends Application {
 		}
 	}
 
-	private Task<?> createWorker(@NamedArg("url") String url) {
+	private Task<?> createWorker(String url) {
 
 		return new Task<Object>() {
 			@Override
